@@ -15,6 +15,8 @@ import com.google.android.exoplayer2.util.Util
 import org.json.JSONArray
 import java.io.BufferedReader
 import java.io.InputStreamReader
+import com.google.android.exoplayer2.upstream.HttpDataSource
+
 
 class MainActivity : AppCompatActivity() {
   private var player: ExoPlayer? = null
