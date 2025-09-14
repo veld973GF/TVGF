@@ -1,21 +1,25 @@
 name: Build PeyiTV APK
 
 on:
-  workflow_dispatch:
+  workflow_dispatch:      # bouton "Run workflow"
   push:
-    branches: [ main ]
+    branches: [ main ]    # build auto quand tu pousses sur main
 
 jobs:
   build:
     runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
 
-      - uses: actions/setup-java@v4
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
           java-version: '17'
 
+      # Android SDK + licences
       - name: Set up Android SDK
         uses: android-actions/setup-android@v3
 
@@ -24,13 +28,15 @@ jobs:
           sdkmanager --install "platform-tools" "platforms;android-34" "build-tools;34.0.0"
           yes | sdkmanager --licenses
 
+      # Télécharge et ajoute Gradle 8.7 au PATH (évite gradle système obsolète)
       - name: Download Gradle 8.7
         run: |
           curl -sLo gradle.zip https://services.gradle.org/distributions/gradle-8.7-bin.zip
           unzip -q gradle.zip -d $HOME
           echo "$HOME/gradle-8.7/bin" >> $GITHUB_PATH
+          gradle -v
 
-      # ⬇️ Crée gradle.properties avec AndroidX activé
+      # ⚙️ Crée gradle.properties avec AndroidX activé
       - name: Create gradle.properties
         run: |
           cat > gradle.properties <<'EOF'
@@ -39,17 +45,23 @@ jobs:
           org.gradle.jvmargs=-Xmx3g -Dfile.encoding=UTF-8
           android.nonTransitiveRClass=true
           EOF
+          echo "gradle.properties created:"
           cat gradle.properties
 
+      # Génère un Gradle Wrapper propre (inclut gradle/wrapper/*.jar)
       - name: Generate Gradle Wrapper (8.7)
         run: |
           gradle wrapper --gradle-version 8.7
           chmod +x gradlew
+          ./gradlew --version
 
+      # Build APK debug
       - name: Build debug APK
         run: ./gradlew --no-daemon assembleDebug
 
-      - uses: actions/upload-artifact@v4
+      # Artifact APK
+      - name: Upload APK artifact
+        uses: actions/upload-artifact@v4
         with:
           name: PeyiTV-debug-apk
           path: app/build/outputs/apk/debug/*.apk
