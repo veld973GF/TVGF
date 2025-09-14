@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.view.View
 import android.view.WindowManager
 import androidx.appcompat.app.AppCompatActivity
+import com.google.android.exoplayer2.DefaultLoadControl
 import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.MediaItem
 import com.google.android.exoplayer2.source.MediaSource
