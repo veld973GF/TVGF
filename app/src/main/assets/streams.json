@@ -1,0 +1,16 @@
+[
+  {
+    "name": "T\u00e9l\u00e9 Peyi Guyane (master)",
+    "url": "https://edge21.vedge.infomaniak.com/livecast/ik:33dm06/manifest.m3u8?spark=376c19b5-f68a-47d9-817a-48a1d25c9943&token=",
+    "headers": {
+      "User-Agent": "Mozilla/5.0",
+      "Referer": "https://player.infomaniak.com/",
+      "Origin": "https://player.infomaniak.com"
+    }
+  },
+  {
+    "name": "Test HLS \u2013 Big Buck Bunny",
+    "url": "https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8",
+    "headers": {}
+  }
+]

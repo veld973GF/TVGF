@@ -1,0 +1,14 @@
+<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Peyi TV (Web)</title><link rel="manifest" href="manifest.webmanifest">
+<style>html,body{margin:0;height:100%;background:#000;color:#fff;font-family:sans-serif}#picker{position:absolute;z-index:2;left:50%;top:50%;transform:translate(-50%,-50%);background:rgba(0,0,0,.8);padding:20px;border-radius:12px}button{display:block;margin:8px 0;padding:10px 16px;font-size:16px}video{position:fixed;inset:0;width:100%;height:100%;background:#000}</style>
+</head><body>
+<div id="picker"></div><video id="video" controls playsinline></video>
+<script src="https://cdn.jsdelivr.net/npm/hls.js@1"></script>
+<script>
+const streams=[
+ {name:"Télé Peyi Guyane (HLS)",url:"https://edge21.vedge.infomaniak.com/livecast/ik:33dm06/manifest.m3u8?spark=376c19b5-f68a-47d9-817a-48a1d25c9943&token="},
+ {name:"Big Buck Bunny (demo)",url:"https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8"}
+];
+const picker=document.getElementById('picker'); streams.forEach(s=>{const b=document.createElement('button'); b.textContent=s.name; b.onclick=()=>play(s.url); picker.appendChild(b);});
+function play(url){picker.style.display='none'; const v=document.getElementById('video'); if(Hls.isSupported()){const h=new Hls({maxBufferLength:5}); h.loadSource(url); h.attachMedia(v); h.on(Hls.Events.MANIFEST_PARSED,()=>{v.play(); v.requestFullscreen&&v.requestFullscreen();});} else if(v.canPlayType('application/vnd.apple.mpegurl')){v.src=url; v.play(); v.requestFullscreen&&v.requestFullscreen();} else {alert('HLS non supporté sur ce navigateur.');}}
+</script></body></html>
