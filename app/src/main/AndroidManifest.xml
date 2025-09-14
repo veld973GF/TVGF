@@ -11,7 +11,8 @@
         android:label="Peyi TV"
         android:supportsRtl="true"
         android:usesCleartextTraffic="true"
-        android:theme="@style/Theme.PeyiTV">
+        android:theme="@style/Theme.PeyiTV"
+        tools:replace="android:label">
 
         <activity
             android:name=".MainActivity"
