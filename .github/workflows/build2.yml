@@ -19,7 +19,7 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
 
-      # Installe le SDK Android (cmdline-tools) et accepte les licences
+      # Android SDK + licences
       - name: Set up Android SDK
         uses: android-actions/setup-android@v3
 
@@ -28,26 +28,26 @@ jobs:
           sdkmanager --install "platform-tools" "platforms;android-34" "build-tools;34.0.0"
           yes | sdkmanager --licenses
 
-      # Installe Gradle (binaire système) uniquement pour générer un vrai wrapper
-      - name: Install Gradle (for wrapper generation)
+      # Télécharge Gradle 8.7 (au lieu d'utiliser le gradle système trop vieux)
+      - name: Download Gradle 8.7
         run: |
-          sudo apt-get update
-          sudo apt-get install -y gradle
-          gradle --version
+          curl -sLo gradle.zip https://services.gradle.org/distributions/gradle-8.7-bin.zip
+          unzip -q gradle.zip -d $HOME
+          echo "$HOME/gradle-8.7/bin" >> $GITHUB_PATH
 
-      # Génère un wrapper propre (créera: gradlew, gradlew.bat, gradle/wrapper/*.jar, *.properties)
-      - name: Generate Gradle Wrapper
+      # Génére un wrapper propre (gradlew + gradle/wrapper/*.jar)
+      - name: Generate Gradle Wrapper (8.7)
         run: |
+          gradle -v
           gradle wrapper --gradle-version 8.7
           chmod +x gradlew
 
-      # Build APK debug avec le wrapper fraîchement généré
+      # Build APK debug avec le wrapper
       - name: Build debug APK
-        run: ./gradlew assembleDebug
+        run: ./gradlew --no-daemon assembleDebug
 
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
         with:
           name: PeyiTV-debug-apk
           path: app/build/outputs/apk/debug/*.apk
-
