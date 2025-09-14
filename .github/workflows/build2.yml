@@ -3,11 +3,12 @@ name: Build PeyiTV APK
 on:
   workflow_dispatch:
   push:
-    branches: [ main, master ]
+    branches: [ main ]
 
 jobs:
   build:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -18,19 +19,29 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
 
-      - name: Cache Gradle
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/.gradle/caches
-            ~/.gradle/wrapper
-          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
-          restore-keys: |
-            ${{ runner.os }}-gradle-
+      # Installe le SDK Android (cmdline-tools) et accepte les licences
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
 
-      - name: Grant execute permission for gradlew
-        run: chmod +x gradlew || true
+      - name: Install Android components
+        run: |
+          sdkmanager --install "platform-tools" "platforms;android-34" "build-tools;34.0.0"
+          yes | sdkmanager --licenses
 
+      # Installe Gradle (binaire système) uniquement pour générer un vrai wrapper
+      - name: Install Gradle (for wrapper generation)
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y gradle
+          gradle --version
+
+      # Génère un wrapper propre (créera: gradlew, gradlew.bat, gradle/wrapper/*.jar, *.properties)
+      - name: Generate Gradle Wrapper
+        run: |
+          gradle wrapper --gradle-version 8.7
+          chmod +x gradlew
+
+      # Build APK debug avec le wrapper fraîchement généré
       - name: Build debug APK
         run: ./gradlew assembleDebug
 
@@ -39,3 +50,4 @@ jobs:
         with:
           name: PeyiTV-debug-apk
           path: app/build/outputs/apk/debug/*.apk
+
